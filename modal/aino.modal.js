@@ -26,7 +26,8 @@ this.Aino.modal = (function($, window, undefined) {
             loadCSS: true,
             duration: 400,
             className: '',
-            opacity: .8
+            opacity: .8,
+            focus: true
         },
         
         // internal options
@@ -64,7 +65,7 @@ this.Aino.modal = (function($, window, undefined) {
             if ( options.loadCSS ) {
                 Aino.loadCSS( path + 'aino.modal.css', append );
             } else {
-                append();
+                $(append);
             }
             
             return modal;
@@ -145,6 +146,9 @@ this.Aino.modal = (function($, window, undefined) {
                         el.box.css('height','auto');
                         el.content.css('visibility','visible');
                         el.close.show();
+                        if (options.focus) {
+                            el.content.find('input:visible,textarea:visible').eq(0).focus();
+                        }
                     }
                 });
                 
