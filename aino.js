@@ -8,9 +8,10 @@ this.Aino = window.Aino || (function($, window, undefined) {
         $doc = $(document),
         
         // The script’s path (it’s always the last found)
-        PATH = (function(src) {
-        
-            var slices = src.split('/');
+        getPath = function() {
+            
+            var src = $('script:last').attr('src'),
+                slices = src.split('/');
         
             if (slices.length == 1) {
                 return '';
@@ -19,7 +20,10 @@ this.Aino = window.Aino || (function($, window, undefined) {
             slices.pop();
             return slices.join('/') + '/';
         
-        }( $('script:last').attr('src') )),
+        },
+        
+        // cache this script’s path
+        PATH = getPath(),
     
         // IE Detection
         IE = (function( div ) {
@@ -33,7 +37,10 @@ this.Aino = window.Aino || (function($, window, undefined) {
             
             return v > 4 ? v : undef;
             
-        }( document.createElement('div') ))
+        }( document.createElement('div') ));
+    
+    // add a js class
+    document.documentElement.className+=' js';
         
     return {
         
@@ -48,7 +55,7 @@ this.Aino = window.Aino || (function($, window, undefined) {
             
             Aino.removeDottedBorders();
             
-            if (Aino.DEBUG) {
+            if ( Aino.DEBUG ) {
                 
                 Aino.loadCSS( PATH + 'aino.error.css');
             
@@ -60,21 +67,20 @@ this.Aino = window.Aino || (function($, window, undefined) {
                 });
             }
             
+            return this;
+            
         },
         
+        // remove dotted borders on links without disturbing accessibility
         removeDottedBorders: function() {
             
-            var style;
-            
-            $('a').live('mousedown', function() {
-                $(this).css('outline','none');
-            }).live('mouseout', function() {
-                style = $(this).attr('style');
-                if (/outline/.test(style)) {
-                    style = style.replace(/outline:[^;]+;/g,'');
-                    $(this).attr('style', style);
+            $('a').live('mousedown mouseup', function(e) {
+                if ('hideFocus' in this) { // IE
+                    this.hideFocus = e.type == 'mousedown';
                 }
-            })
+                this.blur();
+            });
+            return this;
         },
         
         // slice array
@@ -102,59 +108,76 @@ this.Aino = window.Aino || (function($, window, undefined) {
                     throw new Error(type + ': ' + msg);
                 }
             }
+            
+            return this;
 
         },
         
         // logging method
         log: function() {
             
-            if ( !Aino.DEBUG ) {
-                return;
+            if ( Aino.DEBUG ) {
+                try {
+                    window.console.log.apply(this, Aino.array( arguments ) )
+                } catch(e) {}
             }
             
-            try {
-                window.console.log.apply(this, Aino.array( arguments ) )
-            } catch(e) {}
+            return this;
+            
+        },
+        
+        // bodyclass views
+        views: function( views ) {
+            
+            $( ['_global'].concat( document.body.className.split(' ') ) ).each( function(i, name) {
+                if ( typeof views[ name ] == 'function' ) {
+                    views[ name ].call( Aino );
+                }
+            });
             
         },
         
         // utility for executing a method when another method returns true
-        wait : function(options) {
-            options = $.extend({
-                until : function() { return false; },
-                success : function() {},
-                error : function() { Aino.raise('Could not complete wait function.'); },
-                timeout: 3000
-            }, options);
+        when : function( until, success, err, timeout) {
+            
+            timeout = timeout || 10000;
+            
+            if (typeof err == 'number') {
+                timeout = err;
+            }
 
+            success = success || function(){};
+            
             var start = Aino.timestamp(),
                 elapsed,
                 now,
                 fn = function() {
                     now = Aino.timestamp();
                     elapsed = now - start;
-                    if ( options.until( elapsed ) ) {
-                        options.success();
+                    if ( until( elapsed ) ) {
+                        success.call( Aino, elapsed );
                         return false;
                     }
 
-                    if (now >= start + options.timeout) {
-                        options.error();
+                    if (now >= start + timeout) {
+                        if (typeof err == 'function') {
+                            err.call( Aino, elapsed );
+                        }
                         return false;
                     }
                     window.setTimeout(fn, 2);
                 };
 
             window.setTimeout(fn, 2);
+            
+            return this;
         },
         
         // for HTML prototyping
         prototyping: function() {
             
             // placeholder image
-            $('img[src="#"]').css({
-                border: '1px solid #ddd'
-            }).each(function() {
+            $('img[src="#"]').each(function() {
                 $(this).css({
                     border: '1px solid #ddd',
                     display: 'inline-block',
@@ -166,6 +189,8 @@ this.Aino = window.Aino || (function($, window, undefined) {
             $('a[href="#"]').live('click', function(e) {
                 e.preventDefault();
             });
+            
+            return this;
             
         },
         
@@ -185,7 +210,7 @@ this.Aino = window.Aino || (function($, window, undefined) {
 
             if ( typeof id === 'function' ) {
                 callback = id;
-                id = undef;
+                id = undefined;
             }
 
             callback = callback || function() {}; // dirty
@@ -221,7 +246,7 @@ this.Aino = window.Aino || (function($, window, undefined) {
                     if ( styles.length ) {
                         styles.get(0).parentNode.insertBefore( link, styles[0] );
                     } else {
-                        DOM().head.appendChild( link );
+                        $('head').append( link );
                     }
 
                     if ( IE ) {
@@ -263,22 +288,31 @@ this.Aino = window.Aino || (function($, window, undefined) {
 
             if ( typeof callback === 'function' ) {
 
-                Aino.wait({
-                    until: function() {
-                        return ready && document.styleSheets.length > length;
-                    },
-                    success: function() {
-                        window.setTimeout(function() {
-                            callback.call( link, link );
-                        }, 100);
-                    },
-                    error: function() {
-                        Aino.raise( 'CSS at ' + href + ' could not load' );
-                    },
-                    timeout: 1000
-                });
+                Aino.when(function() {
+                    return ready && document.styleSheets.length > length;
+                }, function() {
+                    window.setTimeout(function() {
+                        callback.call( link, link );
+                    }, 100);
+                }, function() {
+                    Aino.raise( 'CSS at ' + href + ' could not load' );
+                }, 5000 );
             }
-            return link;
+            return this;
+        },
+        
+        getScriptPath: getPath,
+        
+        create: function( selector, type ) {
+            var elem = $(document.createElement( type || 'div')),
+                reg = /\#/;
+            if (selector) {
+                if( reg.test(selector) ) {
+                    return elem.attr('id', selector.replace(reg,'') );
+                }
+                return elem.addClass( selector );
+            }
+            return elem;
         },
         
         // parse anything into a number
