@@ -35,27 +35,38 @@ this.Aino.modal = (function($, window, undefined) {
         // cache some values
         width = 0,
         height = 0,
-        scroll = 0;
+        scroll = 0,
+        
+        // get meassures
+        getHeight = function() {
+            return el.content.outerHeight();
+        },
+        getWidth = function() {
+            return el.content.outerWidth()
+        };
     
     // build
-    $('modal overlay modal-box modal-content modal-close modal-preload'.split(' ')).each(function() {
+    $('modal overlay modal-box modal-content modal-close modal-preload modal-inner'.split(' ')).each(function() {
         el[this.replace(/modal-/,'')] = Aino.create('#aino-' + this);
     });
     el.close.hide().html('&#215;').click(function() {
         modal.close();
     });
+    el.content.append( el.inner );
     el.box.append( el.content, el.close );
-    el.modal.hide().append( el.overlay, el.preload, el.box );
+    el.modal.hide().append( el.overlay.hide(), el.preload.hide(), el.box );
     el.overlay.css('opacity', options.opacity);
-    el.preload.hide();
     
     // attach public methods
     return $.extend(modal, {
         
-        init: function() {
+        init: function( ready ) {
             initialized = true;
             var append = function() {
                 el.modal.appendTo( document.body );
+                if (typeof ready == 'function') {
+                    ready.call( modal );
+                }
             } 
             if ( options.loadCSS ) {
                 Aino.loadCSS( path + 'aino.modal.css', append );
@@ -68,93 +79,104 @@ this.Aino.modal = (function($, window, undefined) {
         close: function() {
             el.box.attr('class', '');
             el.close.hide();
-            el.box.stop().css('visibility','hidden');
-            el.content.css('visibility','hidden').empty();
+            el.box.stop().css({
+                top: 0,
+                left: 0
+            });
+            el.inner.empty();
+            el.content.css('visibility', 'hidden');
+            el.preload.hide();
             height = 0;
             width = 0;
             scroll = 0;
             el.overlay.stop().fadeOut(options.duration, function() {
-                el.modal.add(el.preload).hide();
+                el.modal.hide();
             });
-            Aino.log('closed');
         },
         
         insert: function( html ) {
-            el.content.html( html );
+            el.inner.html( html );
         },
         
         append: function( html ) {
-            el.content.append( html );
+            el.inner.append( html );
         },
         
         prepend: function( html ) {
-            el.content.prepend( html );
+            el.inner.prepend( html );
         },
         
         get: function( url ) {
-            modal.preload();
-            window.setTimeout(function() {
-                modal.open('<h3>Success!</h3><p>success, yea!</p>');
-            },1000);
-            /*
-            $.get( url, function() {
-                modal.open( url );
+            $.get( url, function( data ) {
+                modal.open( data );
             });
-            */
+            modal.preload();
         },
         
         preload: function() {
             if (!initialized) {
                 modal.init();
             }
-            el.box.css('visibility','hidden');
             el.modal.add( el.preload ).show();
             el.overlay.show().css('opacity', options.opacity);
         },
         
         open: function( html, opts ) {
+            
             if (opts) {
                 modal.config( opts );
             }
-            el.box.css('visibility','hidden').addClass( options.className );
-            el.preload.fadeOut( options.duration/2 );
-            el.overlay.show().css('opacity', options.opacity);
-            el.content.append( html );
-            Aino.when(function() {
-                // watch for change
-                return el.content.outerHeight(true) > height || el.content.outerWidth(true) > width;
-            }, function() {
-                height = el.content.outerHeight(true);
-                width = el.content.outerWidth(true);
-                scroll = $(window).scrollTop();
-                el.content.css('visibility', 'hidden');
-                el.box.css({
-                    visibility: 'visible',
-                    opacity:0,
-                    marginLeft: width/2*-1 + 20,
-                    marginTop: height/2*-1 + scroll + 20,
-                    width: width - 40,
-                    height: height - 40
-                }).animate({
-                    opacity:1,
-                    width: width,
-                    height: height,
-                    marginLeft: width/2*-1,
-                    marginTop: height/2*-1 + scroll
-                },{
-                    duration: options.duration,
-                    complete:function() {
-                        el.box.css('height','auto');
-                        el.content.css('visibility','visible');
-                        el.close.show();
-                        if (options.focus) {
-                            el.content.find('input:visible,textarea:visible').eq(0).focus();
+            
+            var ready = function() {
+            
+                el.modal.show();
+                
+                el.box.css('visibility','hidden').addClass( options.className );
+                
+                el.preload.fadeOut( options.duration/2 );
+                el.overlay.show().css('opacity', options.opacity);
+                el.inner.append( html );
+
+                Aino.when(function(time) {
+                    // watch for change
+                    return getHeight() > height || getWidth() > width;
+                }, function() {
+                    height = getHeight();
+                    width = getWidth();
+                    scroll = $(window).scrollTop();
+                    el.box.css({
+                        top: '50%',
+                        left: '50%',
+                        visibility: 'visible',
+                        opacity: 0,
+                        marginLeft: width/2*-1 + 20,
+                        marginTop: height/2*-1 + scroll + 20,
+                        width: width - 40,
+                        height: height - 40
+                    }).animate({
+                        opacity:1,
+                        width: width,
+                        height: height,
+                        marginLeft: width/2*-1,
+                        marginTop: height/2*-1 + scroll
+                    },{
+                        duration: options.duration,
+                        complete:function() {
+                            el.box.css('height','auto');
+                            el.close.show();
+                            el.content.css('visibility', 'visible');
+                            if (options.focus) {
+                                el.inner.find('input:visible,textarea:visible').eq(0).focus();
+                            }
                         }
-                    }
-                });
-            }, function() {
-                Aino.raise('Modal size not found');
-            }, 1000);
+                    });
+                }, function() {
+                    Aino.raise('Modal size not found');
+                }, 1000);
+            }
+            
+            initialized ? ready() : modal.init( ready );
+            
             return modal;
         },
         

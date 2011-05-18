@@ -1,3 +1,18 @@
-#aino-error{position:fixed;top:10px;left:10px;right:10px;font:13px/18px arial,sans-serif;}
-#aino-error > div{background:#222;color:#fff;padding:5px;margin-bottom:5px;}
-#aino-error > div.fatal{background:#811}
+#aino-error {
+    position: fixed;
+    top: 10px;
+    left: 10px;
+    right: 10px;
+    font: 13px/18px arial,sans-serif;
+}
+
+#aino-error > div {
+    background: #222;
+    color: #fff;
+    padding: 5px;
+    margin-bottom: 5px;
+}
+
+#aino-error > div.fatal {
+    background:#811;
+}
