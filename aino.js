@@ -9,17 +9,13 @@ this.Aino = window.Aino || (function($, window, undefined) {
         
         // The script’s path (it’s always the last found)
         getPath = function() {
-            
             var src = $('script:last').attr('src'),
                 slices = src.split('/');
-        
             if (slices.length == 1) {
                 return '';
             }
-        
             slices.pop();
             return slices.join('/') + '/';
-        
         },
         
         // cache this script’s path
@@ -27,16 +23,12 @@ this.Aino = window.Aino || (function($, window, undefined) {
     
         // IE Detection
         IE = (function( div ) {
-            
             var undef, v = 3;
-            
             while (
                 div.innerHTML = '<!--[if gt IE '+(++v)+']><i></i><![endif]-->',
                 div.getElementsByTagName('i')[0]
             );
-            
             return v > 4 ? v : undef;
-            
         }( document.createElement('div') ));
     
     // add a js class
@@ -52,28 +44,20 @@ this.Aino = window.Aino || (function($, window, undefined) {
         
         // the init
         init: function() {
-            
             Aino.removeDottedBorders();
-            
             if ( Aino.DEBUG ) {
-                
                 Aino.loadCSS( PATH + 'aino.error.css');
-            
                 Aino.prototyping();
-            
                 $doc.ajaxError(function(e, xhr, settings) {
                     Aino.raise( xhr.responseText );
                     Aino.raise( 'Ajax error from URL: ' + settings.url, true );
                 });
             }
-            
             return this;
-            
         },
         
         // remove dotted borders on links without disturbing accessibility
         removeDottedBorders: function() {
-            
             $('a').live('mousedown mouseup', function(e) {
                 if ('hideFocus' in this) { // IE
                     this.hideFocus = e.type == 'mousedown';
@@ -95,59 +79,44 @@ this.Aino = window.Aino || (function($, window, undefined) {
         
         // error handling
         raise: function( msg, fatal ) {
-
             var type = fatal ? 'Fatal error' : 'Error',
                 error = $('#aino-error').length ? $('#aino-error') : $('<div>').attr('id','aino-error').appendTo( document.body );
-
             // if debug is on, display errors and throw exception if fatal
             if ( Aino.DEBUG ) {
-                
                 error.append( $('<div>').addClass( fatal ? 'fatal' : '').html( type + ': ' + msg ) );
-                
                 if ( fatal ) {
                     throw new Error(type + ': ' + msg);
                 }
             }
-            
             return this;
-
         },
         
         // logging method
         log: function() {
-            
             if ( Aino.DEBUG ) {
                 try {
                     window.console.log.apply(this, Aino.array( arguments ) )
                 } catch(e) {}
             }
-            
             return this;
-            
         },
         
         // bodyclass views
         views: function( views ) {
-            
             $( ['_global'].concat( document.body.className.split(' ') ) ).each( function(i, name) {
                 if ( typeof views[ name ] == 'function' ) {
                     views[ name ].call( Aino );
                 }
             });
-            
         },
         
         // utility for executing a method when another method returns true
         when : function( until, success, err, timeout) {
-            
             timeout = timeout || 10000;
-            
             if (typeof err == 'number') {
                 timeout = err;
             }
-
             success = success || function(){};
-            
             var start = Aino.timestamp(),
                 elapsed,
                 now,
@@ -158,7 +127,6 @@ this.Aino = window.Aino || (function($, window, undefined) {
                         success.call( Aino, elapsed );
                         return false;
                     }
-
                     if (now >= start + timeout) {
                         if (typeof err == 'function') {
                             err.call( Aino, elapsed );
@@ -167,15 +135,12 @@ this.Aino = window.Aino || (function($, window, undefined) {
                     }
                     window.setTimeout(fn, 2);
                 };
-
             window.setTimeout(fn, 2);
-            
             return this;
         },
         
         // for HTML prototyping
         prototyping: function() {
-            
             // placeholder image
             $('img[src="#"]').each(function() {
                 $(this).css({
@@ -184,18 +149,14 @@ this.Aino = window.Aino || (function($, window, undefined) {
                     background: '#fff url(' + PATH + 'placeholder.png' + ') no-repeat 50% 50%'
                 }).width( this.width-2 ).height( this.height-2 );
             });
-            
             // prevent page jump on #
             $('a[href="#"]').live('click', function(e) {
                 e.preventDefault();
             });
-            
             return this;
-            
         },
         
         loadCSS : function( href, id, callback ) {
-
             var link,
                 ready = false,
                 length;
@@ -207,28 +168,25 @@ this.Aino = window.Aino || (function($, window, undefined) {
                     return false;
                 }
             });
-
             if ( typeof id === 'function' ) {
                 callback = id;
                 id = undefined;
             }
-
             callback = callback || function() {}; // dirty
-
+            
             // if already present, return
             if ( link ) {
                 callback.call( link, link );
                 return link;
             }
-
+            
             // save the length of stylesheets to check against
             length = document.styleSheets.length;
-
             // add timestamp if DEBUG is true
             if ( Aino.DEBUG ) {
                 href += '?' + Aino.timestamp();
             }
-
+            
             // check for existing id
             if( $('#'+id).length ) {
                 $('#'+id).attr('href', href);
@@ -240,7 +198,6 @@ this.Aino = window.Aino || (function($, window, undefined) {
                     href: href,
                     id: id
                 }).get(0);
-
                 window.setTimeout(function() {
                     var styles = $('link[rel="stylesheet"], style');
                     if ( styles.length ) {
@@ -248,7 +205,6 @@ this.Aino = window.Aino || (function($, window, undefined) {
                     } else {
                         $('head').append( link );
                     }
-
                     if ( IE ) {
 
                         // IE has a limit of 31 stylesheets in one document
@@ -256,7 +212,6 @@ this.Aino = window.Aino || (function($, window, undefined) {
                             Aino.raise( 'You have reached the browser stylesheet limit (31)', true );
                             return;
                         }
-                        
                         link.onreadystatechange = function(e) {
                             if ( !ready && (!this.readyState ||
                                 this.readyState === 'loaded' || this.readyState === 'complete') ) {
@@ -264,7 +219,6 @@ this.Aino = window.Aino || (function($, window, undefined) {
                             }
                         };
                     } else {
-                        
                         // final test via ajax if not local
                         if ( !( new RegExp('file://','i').test( href ) ) ) {
                             $.ajax({
@@ -285,9 +239,7 @@ this.Aino = window.Aino || (function($, window, undefined) {
                     }
                 }, 10);
             }
-
             if ( typeof callback === 'function' ) {
-
                 Aino.when(function() {
                     return ready && document.styleSheets.length > length;
                 }, function() {
@@ -326,7 +278,5 @@ this.Aino = window.Aino || (function($, window, undefined) {
                 return 0;
             }
         }
-        
     };
-    
 }(jQuery, this));

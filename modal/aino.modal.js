@@ -1,12 +1,11 @@
 
-if (!'Aino' in this) {
+if (!('Aino' in this)) {
     throw new Error('Aino not defined');
 }
 
 this.Aino.modal = (function($, window, undefined) {
     
     var 
-    
         // the "constructor"
         modal = function() {
             return modal.open.apply(modal, Aino.array( arguments ));
@@ -24,9 +23,9 @@ this.Aino.modal = (function($, window, undefined) {
         // default options
         defaults = {
             loadCSS: true,
-            duration: 400,
+            duration: 200,
             className: '',
-            opacity: .8,
+            opacity: .6,
             focus: true
         },
         
@@ -37,37 +36,32 @@ this.Aino.modal = (function($, window, undefined) {
         width = 0,
         height = 0,
         scroll = 0;
-
     
     // build
-    $('modal overlay modal-box modal-content modal-close'.split(' ')).each(function() {
+    $('modal overlay modal-box modal-content modal-close modal-preload'.split(' ')).each(function() {
         el[this.replace(/modal-/,'')] = Aino.create('#aino-' + this);
     });
-    
     el.close.hide().html('&#215;').click(function() {
         modal.close();
     });
-    
     el.box.append( el.content, el.close );
-    el.modal.hide().append( el.overlay, el.box );
+    el.modal.hide().append( el.overlay, el.preload, el.box );
     el.overlay.css('opacity', options.opacity);
+    el.preload.hide();
     
     // attach public methods
     return $.extend(modal, {
         
         init: function() {
-            
             initialized = true;
             var append = function() {
                 el.modal.appendTo( document.body );
-            }
-            
+            } 
             if ( options.loadCSS ) {
                 Aino.loadCSS( path + 'aino.modal.css', append );
             } else {
                 $(append);
             }
-            
             return modal;
         },
         
@@ -79,7 +73,9 @@ this.Aino.modal = (function($, window, undefined) {
             height = 0;
             width = 0;
             scroll = 0;
-            el.overlay.stop().fadeOut(options.duration);
+            el.overlay.stop().fadeOut(options.duration, function() {
+                el.modal.add(el.preload).hide();
+            });
             Aino.log('closed');
         },
         
@@ -95,37 +91,43 @@ this.Aino.modal = (function($, window, undefined) {
             el.content.prepend( html );
         },
         
-        open: function( html, opts ) {
-            
-            if (opts) {
-                modal.config( opts );
-            }
-            
+        get: function( url ) {
+            modal.preload();
+            window.setTimeout(function() {
+                modal.open('<h3>Success!</h3><p>success, yea!</p>');
+            },1000);
+            /*
+            $.get( url, function() {
+                modal.open( url );
+            });
+            */
+        },
+        
+        preload: function() {
             if (!initialized) {
                 modal.init();
             }
-            
-            el.overlay.show();
+            el.box.css('visibility','hidden');
+            el.modal.add( el.preload ).show();
+            el.overlay.show().css('opacity', options.opacity);
+        },
+        
+        open: function( html, opts ) {
+            if (opts) {
+                modal.config( opts );
+            }
             el.box.css('visibility','hidden').addClass( options.className );
-            
-            el.modal.show();
-            
+            el.preload.fadeOut( options.duration/2 );
+            el.overlay.show().css('opacity', options.opacity);
             el.content.append( html );
-            
             Aino.when(function() {
-                
                 // watch for change
-                return el.content.outerHeight() > height || el.content.outerWidth() > width;
-                
+                return el.content.outerHeight(true) > height || el.content.outerWidth(true) > width;
             }, function() {
-                
-                height = el.content.outerHeight();
-                width = el.content.outerWidth();
-                
+                height = el.content.outerHeight(true);
+                width = el.content.outerWidth(true);
                 scroll = $(window).scrollTop();
-                
                 el.content.css('visibility', 'hidden');
-                
                 el.box.css({
                     visibility: 'visible',
                     opacity:0,
@@ -139,8 +141,7 @@ this.Aino.modal = (function($, window, undefined) {
                     height: height,
                     marginLeft: width/2*-1,
                     marginTop: height/2*-1 + scroll
-                },
-                {
+                },{
                     duration: options.duration,
                     complete:function() {
                         el.box.css('height','auto');
@@ -151,11 +152,9 @@ this.Aino.modal = (function($, window, undefined) {
                         }
                     }
                 });
-                
             }, function() {
                 Aino.raise('Modal size not found');
             }, 1000);
-            
             return modal;
         },
         
