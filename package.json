@@ -1,0 +1,13 @@
+{
+  "name": "ainojs",
+  "version": "0.0.1",
+  "description": "Aino JavaScript Tools",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/aino/ainojs"
+  },
+  "license": "MIT",
+  "dependencies": {
+    "jquery": ">=1.10.0"
+  }
+}
