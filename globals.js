@@ -18,9 +18,7 @@
     })
   }
 
-  return function() {
-
-    return {
+  return {
 
     register: function(prop, value) {
       if ( !has(prop) )
@@ -31,7 +29,7 @@
       if ( has(prop) ) {
         globals[prop] = value
         trigger(prop, value)
-      }
+      } else throw('You need to register the global "'+prop+'" first')
     },
 
     get: function(prop) {
