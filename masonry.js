@@ -59,6 +59,9 @@
 
         if ( typeof sz.top !== 'number' || typeof sz.left !== 'number' )
           return
+
+        sz.top = Math.round(sz.top)
+        sz.left = Math.round(sz.left)
         
         $brick.css( sz )
         options.onbrick.call( brick )
@@ -71,7 +74,7 @@
       if (mH < 0 || typeof mH !== 'number')
         return
         
-      $elem.height( mH )
+      $elem.height( Math.ceil(mH) )
     }
 
     var refresh = function(elem) {
