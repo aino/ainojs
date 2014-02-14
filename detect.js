@@ -34,6 +34,18 @@
     chrome: /chrome/.test(ua),
 
     mac: platform.toUpperCase().indexOf('MAC') >= 0,
+
+    retina: function() {
+      if (window.matchMedia) {
+        var mq = window.matchMedia("only screen and (min--moz-device-pixel-ratio: 1.3), only screen and (-o-min-device-pixel-ratio: 2.6/2), only screen and (-webkit-min-device-pixel-ratio: 1.3), only screen  and (min-device-pixel-ratio: 1.3), only screen and (min-resolution: 1.3dppx)")
+        if (mq && mq.matches || (window.devicePixelRatio > 1))
+          return true
+        else
+          return false
+      } else if ( window.devicePixelRatio > 1 )
+        return true
+      return false
+    },
     
     translate3d: (function() {
       var el = document.createElement('p')
