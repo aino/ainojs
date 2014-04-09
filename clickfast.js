@@ -11,8 +11,9 @@
     propagate: true,
     add: function(handleObj) {
       var prop = this.propagate
+      var args = []
       if ( support ) {
-        $(this).on('touchstart.fast', function start(e) {
+        args.push('touchstart.fast', function start(e) {
           var ev = e.originalEvent
           var x
           var y
@@ -35,14 +36,22 @@
           }
         })
       } else {
-        $(this).on('click.fast', handleObj.handler)
+        args = ['click.fast', handleObj.handler]
       }
+      if ( handleObj.selector )
+        args.splice(1, 0, handleObj.selector)
+
+      $(this).on.apply($(this), args)
     },
     remove: function(handleObj) {
       if ( support )
         $(this).off('touchstart.fast touchmove.fast touchend.fast')
-      else
-        $(this).off('click.fast', handleObj.handler)
+      else {
+        var args = ['click.fast', handleObj.handler]
+        if ( handleObj.selector )
+          args.splice(1, 0, handleObj.selector)
+        $(this).off.apply($(this), args)
+      }
     }
   }
 })

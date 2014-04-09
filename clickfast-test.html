@@ -8,6 +8,7 @@
 <body>
 <button class="fast">Click fast</button>
 <button>Click slow</button>
+<a href="#">Delegate</a>
 <div id="result"></div>
 <script>
   $.event.special['click:fast'] = ClickFast
@@ -20,6 +21,10 @@
       e.preventDefault();
       $('#result').html((Date.now()-tid)+'ms')
     })
+  })
+  $(document).on('click:fast', 'a', function(e) {
+    e.preventDefault();
+    console.log(this.nodeName == 'A')
   })
 </script>
 </body>
