@@ -10,6 +10,7 @@
 <button>Click slow</button>
 <a href="#">Delegate</a>
 <div id="result"></div>
+<div id="log"></div>
 <script>
   $.event.special['click:fast'] = ClickFast
   var tid = 0
@@ -20,11 +21,15 @@
     $(this).on(this.className=='fast' ? 'click:fast' : 'click', function(e) {
       e.preventDefault();
       $('#result').html((Date.now()-tid)+'ms')
+      $('#log').html($('#log').html()+e.type+' handler<br>')
     })
   })
   $(document).on('click:fast', 'a', function(e) {
     e.preventDefault();
-    console.log(this.nodeName == 'A')
+    $('#result').html('TRUE '+e.target.nodeName + ':' + this.nodeName)
+  })
+  $(document).on('click', 'a', function() {
+    console.log(this.nodeName)
   })
 </script>
 </body>
