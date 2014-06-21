@@ -1,6 +1,6 @@
 {
   "name": "ainojs",
-  "version": "1.1.0",
+  "version": "2.0.0",
   "description": "Aino JavaScript Tools",
   "repository": {
     "type": "git",
@@ -9,5 +9,29 @@
   "license": "MIT",
   "dependencies": {
     "jquery": ">=1.10.0"
+  },
+  "bugs": {
+    "url": "https://github.com/aino/ainojs/issues"
+  },
+  "homepage": "https://github.com/aino/ainojs",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Aino",
+  "devDependencies": {
+    "browserify": "^4.1.11",
+    "envify": "^1.2.1",
+    "event-stream": "^3.1.5",
+    "gulp": "^3.8.1",
+    "gulp-buffer": "0.0.2",
+    "gulp-concat": "^2.2.0",
+    "gulp-util": "^2.2.17",
+    "gulp-watch": "^0.6.7",
+    "jquery": "^2.1.1",
+    "react": "^0.10.0",
+    "reactify": "^0.13.1",
+    "vinyl-map": "^1.0.1",
+    "vinyl-source-stream": "^0.1.1"
   }
 }

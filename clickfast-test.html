@@ -25,11 +25,7 @@
     })
   })
   $(document).on('click:fast', 'a', function(e) {
-    e.preventDefault();
-    $('#result').html('TRUE '+e.target.nodeName + ':' + this.nodeName)
-  })
-  $(document).on('click', 'a', function() {
-    console.log(this.nodeName)
+    $('#log').html($('#log').html() + 'TRUE '+e.target.nodeName + ':' + this.nodeName+'<br>')
   })
 </script>
 </body>
