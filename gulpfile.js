@@ -57,6 +57,10 @@ var build = function() {
           },{
             transform: ['reactify']
           })
+          .on('error', function(trace) {
+            console.error(trace)
+            fs.writeFileSync(testDir+'/'+dst, trace)
+          })
           .pipe(source())
           .pipe(buffer())
           .pipe(map(function(data, file) {
@@ -69,7 +73,7 @@ var build = function() {
         )
       }
     })
-    fs.writeFileSync(testDir+'/index.html', links.join())
+    fs.writeFileSync(testDir+'/index.html', links.join('<br>'))
     return es.concat.apply(this, tasks)
   })
 }
@@ -77,10 +81,10 @@ var build = function() {
 var watcher = function() {
   watch({glob: testDir+'/*.js'}, function() { build() })
   watch({glob: '*.js'}, function() { build() })
+  watch({glob: 'components/*.js'}, function() { build() })
 }
 
 gulp.task('test', function() {
-  build()
   watcher()
   gutil.log('Tests listening for changes')
 })

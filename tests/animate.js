@@ -3,35 +3,46 @@
 var React = require('react')
 var Animate = require('../animate')
 var Easing = require('../easing')
-var $ = require('jquery')
 
 var App = React.createClass({
   getInitialState: function() {
-    return { left: 0 }
+    return { height: 0, isOpening: false }
   },
-  onStart: function() {
+  open: function() {
     this.animation = Animate({
       from: 0,
-      to: 600,
-      duration: 1000,
-      easing: Easing('easeOutBounce'),
+      to: 400,
+      duration: 2000,
+      easing: Easing('easeOutQuint'),
       step: function(val) {
-        this.setState({ left: val })
+        this.setState({ height: val })
+      }.bind(this),
+      complete: function() {
+        this.setState({ isOpening: false })
       }.bind(this)
     })
+    this.setState({
+      isOpening: true
+    })
+  },
+  stop: function() {
+    this.animation.stop(true)
+    this.setState({ isOpening: false })
   },
   render: function() {
     var style = {
-      width: 100,
-      height: 100,
-      background: '#e22',
+      width: 500,
+      height: this.state.height,
+      background: '#222',
       position: 'absolute',
-      top: 100,
-      left: this.state.left
+      top: 100
     }
+    var btn = this.state.isOpening ?
+      <button onClick={this.stop}>Stop</button> :
+      <button onClick={this.open}>Open</button>
     return (
       <div>
-        <button onClick={this.onStart}>Start</button>
+        {btn}
         <div style={style} />
       </div>
     )
