@@ -4,8 +4,8 @@ module.exports = React.createClass({
 
   defaults: {
     touched: false,
+    touchdown: false,
     coords: { x:0, y:0 },
-    distance: 0,
     evObj: {}
   },
 
@@ -30,24 +30,24 @@ module.exports = React.createClass({
   onTouchStart: function(e) {
     this.setState({ 
       touched: true, 
+      touchdown: true,
       coords: this.getCoords(e),
-      distance: 0,
       evObj: e
     })
   },
 
   onTouchMove: function(e) {
     var coords = this.getCoords(e)
-    this.setState({
-      distance: Math.max( 
-        Math.abs(this.state.coords.x - coords.x), 
-        Math.abs(this.state.coords.y - coords.y) 
-      )
-    })
+    var distance = Math.max( 
+      Math.abs(this.state.coords.x - coords.x), 
+      Math.abs(this.state.coords.y - coords.y) 
+    )
+    if ( distance > 6 )
+      this.setState({ touchdown: false })
   },
 
   onTouchEnd: function() {
-    if(this.state.distance < 6)
+    if(this.state.touchdown)
       this.handler.call(this, this.state.evObj)
     setTimeout(function() {
       if ( this.isMounted() )
@@ -66,6 +66,7 @@ module.exports = React.createClass({
     var classNames = ['touchclick']
 
     this.props.className && classNames.push(this.props.className)
+    this.state.touchdown && classNames.push('touchdown')
 
     return React.DOM[this.props.nodeName || 'button']({
       className: classNames.join(' '),

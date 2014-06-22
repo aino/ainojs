@@ -20,6 +20,7 @@
   },
   "author": "Aino",
   "devDependencies": {
+    "backbone": "^1.1.2",
     "browserify": "^4.1.11",
     "envify": "^1.2.1",
     "event-stream": "^3.1.5",
@@ -31,6 +32,7 @@
     "jquery": "^2.1.1",
     "react": "^0.10.0",
     "reactify": "^0.13.1",
+    "underscore": "^1.6.0",
     "vinyl-map": "^1.0.1",
     "vinyl-source-stream": "^0.1.1"
   }
