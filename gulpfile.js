@@ -43,12 +43,10 @@ var lib = function() {
 
 var build = function(files) {
   var tasks = []
-  //var links = []
-  console.log('Building test files: '+files)
+  console.log('Building testfiles: '+files)
   files.forEach(function(name) {
     var src = path.join(__dirname, DIR, name)
     var dst = name.replace(/\.js/,'.html')
-    //links.push('<a href="/'+DIR+'/'+dst+'">'+name+'</a>')
     tasks.push(
       gulpBrowserify({
         entries: src
@@ -60,7 +58,7 @@ var build = function(files) {
       })
       .on('error', function(trace) {
         console.error(trace)
-        fs.writeFileSync(DIR+'/'+dst, trace)
+        fs.writeFileSync(path.join(DIR, BUILD, dst), trace)
       })
       .pipe(source())
       .pipe(buffer())
@@ -73,7 +71,6 @@ var build = function(files) {
       .pipe(gulp.dest(path.join(DIR, BUILD)))
     )
   })
-  //fs.writeFileSync(DIR+'/index.html', links.join('<br>'))
   return es.concat.apply(this, tasks)
 }
 
