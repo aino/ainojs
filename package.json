@@ -28,7 +28,6 @@
     "gulp-buffer": "0.0.2",
     "gulp-concat": "^2.2.0",
     "gulp-util": "^2.2.17",
-    "gulp-watch": "^0.6.7",
     "jquery": "^2.1.1",
     "react": "^0.10.0",
     "reactify": "^0.13.1",
