@@ -30,7 +30,6 @@ module.exports = React.createClass({
   },
 
   trigger: function(type, ev) {
-    console.log('trigger', arguments)
     typeof this.props[type] == 'function' && this.props[type].call(this, ev)
   },
 
