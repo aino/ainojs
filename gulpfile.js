@@ -43,7 +43,7 @@ var lib = function() {
 
 var build = function(files) {
   var tasks = []
-  console.log('Building testfiles: '+files)
+  gutil.log('Building testfiles: '+files)
   files.forEach(function(name) {
     var src = path.join(__dirname, DIR, name)
     var dst = name.replace(/\.js/,'.html')

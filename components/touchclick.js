@@ -9,7 +9,7 @@ var React = require('react')
 module.exports = React.createClass({
 
   propTypes: {
-    handler: React.PropTypes.func,
+    click: React.PropTypes.func,
     up: React.PropTypes.func,
     down: React.PropTypes.func,
     nodeName: React.PropTypes.string,
@@ -69,7 +69,7 @@ module.exports = React.createClass({
   onTouchEnd: function(e) {
     if(this.state.touchdown) {
       this.trigger('up', this.state.evObj)
-      this.trigger('handler', this.state.evObj)
+      this.trigger('click', this.state.evObj)
     }
     this.timer = setTimeout(function() {
       if ( this.isMounted() )
@@ -81,7 +81,7 @@ module.exports = React.createClass({
     if ( this.state.touched )
       return false
     this.setState(this.defaults)
-    this.trigger('handler', e)
+    this.trigger('click', e)
   },
 
   onMouseDown: function(e) {

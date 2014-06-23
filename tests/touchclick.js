@@ -13,15 +13,15 @@ var App = React.createClass({
       active: false
     }
   },
-  handler: function(e) {
-    log.push('Handler: '+e.type)
+  onClick: function(e) {
+    log.push('Click: '+e.type)
     this.forceUpdate()
   },
-  down: function(e) {
+  onDown: function(e) {
     log.push('Down: '+e.type)
     this.setState({active: true})
   },
-  up: function(e) {
+  onUp: function(e) {
     log.push('Up: '+e.type)
     this.setState({active: false})
   },
@@ -34,8 +34,8 @@ var App = React.createClass({
     return (
       <div>
         <style dangerouslySetInnerHTML={{__html: css}} />
-        <TouchClick handler={this.handler} down={this.down} 
-          up={this.up} nodeName='button' className={this.state.active ? 'active':''}>Touch/click me</TouchClick>
+        <TouchClick click={this.onClick} down={this.onDown} 
+          up={this.onUp} nodeName='button' className={this.state.active ? 'active':''}>Touch/click me</TouchClick>
         {info}
       </div>
     )
