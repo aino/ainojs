@@ -84,22 +84,66 @@ module.exports = React.createClass({
     this.trigger('click', e)
   },
 
+  on: function(type, fn) {
+    var d = document
+    if ( d.addEventListener )
+      return d.addEventListener(type, fn)
+    else if ( d.attachEvent )
+      return d.attachEvent('on'+type, fn)
+  },
+
+  off: function(type, fn) {
+    var d = document
+    if ( d.removeEventListener )
+      return d.removeEventListener(type, fn)
+    else if ( d.detachEvent )
+      return d.detachEvent('on'+type, fn)
+  },
+
   onMouseDown: function(e) {
     if( this.state.touched )
       return false
     this.trigger('down', e)
-    var d = document
-    var mouseUp = function(e) {
-      this.trigger('up', e)
-      if ( d.removeEventListener )
-        d.removeEventListener('mouseup', mouseUp)
-      else if ( d.detachEvent )
-        d.detach('mouseup', mouseUp)
+    var forget = function(){}
+    var c = {}
+    for( var i in e )
+      c[i] = e[i]
+
+    var onMove = function(m) {
+      c.type = 'mousemove'
+      if ( m.target != e.currentTarget && !c.currentTarget.contains(m.target) ) {
+        this.trigger('up', c)
+        forget()
+      }
     }.bind(this)
-    if ( d.addEventListener )
-      d.addEventListener('mouseup', mouseUp)
-    else if ( d.attachEvent )
-      d.attachEvent('mouseup', mouseUp)
+
+    var onDragLeave = function(m) {
+      c.type = 'drag'
+      if ( m.target == c.currentTarget ) {
+        this.trigger('up', c)
+        forget()
+      }
+    }.bind(this)
+
+    var onMouseUp = function(m) {
+      this.trigger('up', m)
+      forget()
+    }.bind(this)
+
+    forget = function() {
+      this.off('mousemove', onMove)
+      this.off('dragleave', onDragLeave)
+      this.off('mouseup', onMouseUp)
+    }.bind(this)
+
+    this.on('mousemove', onMove)
+    this.on('dragleave', onDragLeave)
+    this.on('mouseup', onMouseUp)
+
+  },
+
+  onDragLeave: function(e) {
+    console.log(e.target)
   },
 
   render: function() {
