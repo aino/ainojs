@@ -30,6 +30,7 @@ module.exports = React.createClass({
   },
 
   trigger: function(type, ev) {
+    console.log('trigger', arguments)
     typeof this.props[type] == 'function' && this.props[type].call(this, ev)
   },
 
@@ -109,14 +110,6 @@ module.exports = React.createClass({
     for( var i in e )
       c[i] = e[i]
 
-    var onMove = function(m) {
-      c.type = 'mousemove'
-      if ( m.target != e.currentTarget && !c.currentTarget.contains(m.target) ) {
-        this.trigger('up', c)
-        forget()
-      }
-    }.bind(this)
-
     var onDragLeave = function(m) {
       c.type = 'drag'
       if ( m.target == c.currentTarget ) {
@@ -126,18 +119,17 @@ module.exports = React.createClass({
     }.bind(this)
 
     var onMouseUp = function(m) {
-      this.trigger('up', m)
+      c.type = 'mouseup'
+      this.trigger('up', c)
       forget()
     }.bind(this)
 
     forget = function() {
-      this.off('mousemove', onMove)
-      this.off('dragleave', onDragLeave)
+      this.off('dragend', onMouseUp)
       this.off('mouseup', onMouseUp)
     }.bind(this)
 
-    this.on('mousemove', onMove)
-    this.on('dragleave', onDragLeave)
+    this.on('dragend', onMouseUp)
     this.on('mouseup', onMouseUp)
 
   },
