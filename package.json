@@ -1,15 +1,13 @@
 {
   "name": "ainojs",
-  "version": "2.0.0",
+  "version": "2.0.7",
   "description": "Aino JavaScript Tools",
   "repository": {
     "type": "git",
     "url": "https://github.com/aino/ainojs"
   },
   "license": "MIT",
-  "dependencies": {
-    "jquery": ">=1.10.0"
-  },
+  "dependencies": {},
   "bugs": {
     "url": "https://github.com/aino/ainojs/issues"
   },
@@ -20,6 +18,7 @@
   },
   "author": "Aino",
   "devDependencies": {
+    "jquery": ">=1.10.0",
     "backbone": "^1.1.2",
     "browserify": "^4.1.11",
     "envify": "^1.2.1",
