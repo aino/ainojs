@@ -46,7 +46,7 @@ module.exports = React.createClass({
   onTouchStart: function(e) {
     clearTimeout(this.timer)
     this.setState({
-      touched: true, 
+      touched: !( /^(select|input|textarea)$/i.test(e.target.nodeName) ), 
       touchdown: true,
       coords: this.getCoords(e),
       evObj: e
@@ -70,6 +70,15 @@ module.exports = React.createClass({
     if(this.state.touchdown) {
       this.trigger('up', this.state.evObj)
       this.trigger('click', this.state.evObj)
+
+      // optimize form controls too
+      if ( !this.state.touched && !/^(radio|checkbox)$/i.test(e.target.type) )
+        e.target.focus()
+
+      // allow button submit
+      if ( e.target.nodeName == 'BUTTON' && e.target.type == 'submit' )
+        e.target.form.submit()
+      
     }
     this.timer = setTimeout(function() {
       if ( this.isMounted() )
@@ -109,14 +118,6 @@ module.exports = React.createClass({
     for( var i in e )
       c[i] = e[i]
 
-    var onDragLeave = function(m) {
-      c.type = 'drag'
-      if ( m.target == c.currentTarget ) {
-        this.trigger('up', c)
-        forget()
-      }
-    }.bind(this)
-
     var onMouseUp = function(m) {
       c.type = 'mouseup'
       this.trigger('up', c)
@@ -126,15 +127,13 @@ module.exports = React.createClass({
     forget = function() {
       this.off('dragend', onMouseUp)
       this.off('mouseup', onMouseUp)
+      this.off('contextmenu', onMouseUp)
     }.bind(this)
 
     this.on('dragend', onMouseUp)
     this.on('mouseup', onMouseUp)
+    this.on('contextmenu', onMouseUp)
 
-  },
-
-  onDragLeave: function(e) {
-    console.log(e.target)
   },
 
   render: function() {

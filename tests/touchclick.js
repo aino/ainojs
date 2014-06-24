@@ -39,6 +39,31 @@ var App = React.createClass({
           <a href="#/foo">Touch/click/drag me</a>
         </TouchClick>
         {info}
+        <h2>Forms:</h2>
+        <TouchClick nodeName="form">
+          <textarea />
+          <br />
+          <input />
+          <br />
+          <input type="text" />
+          <br />
+          <input type="email" />
+          <br />
+          <input type="date" />
+          <br />
+          <input type="datetime" />
+          <br />
+          <input type="number" />
+          <br />
+          <input type="radio" />
+          <br />
+          <input type="checkbox" />
+          <br />
+          <input type="submit" />
+          <br />
+          <button type="submit">Button submit</button>
+        </TouchClick>
+        <input type="date" />
       </div>
     )
   }
