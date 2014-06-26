@@ -64,7 +64,10 @@ var build = function(files) {
       .pipe(buffer())
       .pipe(map(function(data, file) {
         var script = data.toString()
-        return '<html><head><title>Test for '+name+'</title><script src="lib.js"></script></head>'+
+        var css = script.match(/\/\*CSS((.|\n)+?)\*\//)
+        var style = ( css && css.length > 1 ) ? '<style>'+css[1]+'</style>' : ''
+
+        return '<html><head><title>Test for '+name+'</title><script src="lib.js"></script>'+style+'</head>'+
                '<body><script>'+script+'</script></body></html>'
       }))
       .pipe(concat(dst))
@@ -95,7 +98,7 @@ gulp.task('test', function() {
   }
   gulp.watch( DIR+'/*.js', handler )
   gulp.watch( 'components/*.js', handler )
-  gulp.watch( '/*.js', handler )
+  gulp.watch( '*.js', handler )
   dispatch()
   lib()
   gutil.log('Tests listening for changes')
