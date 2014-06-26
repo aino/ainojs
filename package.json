@@ -1,6 +1,6 @@
 {
   "name": "ainojs",
-  "version": "2.1.1",
+  "version": "2.1.2",
   "description": "Aino JavaScript Tools",
   "repository": {
     "type": "git",
@@ -18,7 +18,7 @@
   },
   "author": "Aino",
   "devDependencies": {
-    "jquery": ">=1.10.0",
+    "jquery": "^2.1.1",
     "backbone": "^1.1.2",
     "browserify": "^4.1.11",
     "envify": "^1.2.1",
@@ -27,7 +27,6 @@
     "gulp-buffer": "0.0.2",
     "gulp-concat": "^2.2.0",
     "gulp-util": "^2.2.17",
-    "jquery": "^2.1.1",
     "react": "^0.10.0",
     "reactify": "^0.13.1",
     "underscore": "^1.6.0",
